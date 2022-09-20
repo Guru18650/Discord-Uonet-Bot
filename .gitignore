@@ -1,1 +1,4 @@
 .env
+keystore.json
+account.json
+__pycache__
