@@ -41,6 +41,9 @@ async def on_message(message):
 
     if message.content.startswith('$numerek'):
         await message.channel.send(embed = await uonet.GetLuckyNumberEmbed(VClient))
+    
+    if message.content.startswith('$oceny'):
+        await message.channel.send(embed = await uonet.GetGradesEmbed(VClient))
 
         
 bot.run(os.getenv("DISCORD_TOKEN"))
