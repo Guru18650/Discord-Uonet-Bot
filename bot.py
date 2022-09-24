@@ -1,24 +1,23 @@
 # This example requires the 'message_content' intent.
 
 from http import client
-import discord, os, weather, uonet, asyncio
+import discord, os, weather, uonet, schedule, time
 from vulcan import Keystore, Account, Vulcan
 from dotenv import load_dotenv
-
+from discord.ext import commands
 
 load_dotenv()
 
-intents = discord.Intents.default()
-intents.message_content = True
+intent = discord.Intents.default()
+intent.members = True
+intent.message_content = True
 
-bot = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intent);
 
 with open("keystore.json") as f:
     keystore = Keystore.load(f)
 with open("account.json") as f:
     account = Account.load(f)
-
-
 
 @bot.event
 async def on_ready():
@@ -28,22 +27,26 @@ async def on_ready():
     VClient = Vulcan(keystore, account)
     await VClient.select_student()
     
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-    
-    if message.content.startswith('$pogoda'):
-        await message.channel.send(embed=weather.GetWeatherEmbed())
+@bot.command()
+async def test(ctx, arg):
+    await ctx.send(arg)
+@bot.command()
+async def plan(ctx, date=""):
+    await ctx.send(embed = await uonet.GetTimetableEmbed(VClient, date)) 
+@bot.command()
+async def oceny(ctx):
+    await ctx.send(embed = await uonet.GetGradesEmbed(VClient))
+@bot.command()
+async def pogoda(ctx):
+    await ctx.send(embed = weather.GetWeatherEmbed())
+@bot.command()
+async def numerek(ctx, date=""):
+    await ctx.send(embed = await uonet.GetLuckyNumberEmbed(VClient, date))
+@bot.command()
+async def sprawdziany(ctx):
+    await ctx.send(embed = await uonet.GetExamsEmbed(VClient))
 
-    if message.content.startswith('$plan'):
-        await message.channel.send(embed = await uonet.GetTimetableEmbed(VClient)) 
-
-    if message.content.startswith('$numerek'):
-        await message.channel.send(embed = await uonet.GetLuckyNumberEmbed(VClient))
-    
-    if message.content.startswith('$oceny'):
-        await message.channel.send(embed = await uonet.GetGradesEmbed(VClient))
-
-        
 bot.run(os.getenv("DISCORD_TOKEN"))
+
+
+
