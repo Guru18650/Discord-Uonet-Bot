@@ -1,10 +1,11 @@
 # This example requires the 'message_content' intent.
 
 from http import client
-import discord, os, weather, uonet, schedule, time
+import discord, os, weather, uonet, mysql_c
 from vulcan import Keystore, Account, Vulcan
 from dotenv import load_dotenv
 from discord.ext import commands
+
 
 load_dotenv()
 
@@ -45,6 +46,17 @@ async def numerek(ctx, date=""):
 @bot.command()
 async def sprawdziany(ctx):
     await ctx.send(embed = await uonet.GetExamsEmbed(VClient))
+@bot.command()
+async def zadania(ctx):
+    await ctx.send(embed = await uonet.GetHomeworkEmbed(VClient))
+    await ctx.send(embed = mysql_c.readHomework())
+@bot.command()
+async def dodajzadanie(ctx, x, y, z, w):
+    mysql_c.addHomework(x, y, z, w)
+    await ctx.send("Pomyślnie dodano zadanie :)")
+async def dodajtest(ctx, x, y, z, w):
+    mysql_c.addExam(x, y, z, w)
+    await ctx.send("Pomyślnie dodano test :)")
 
 bot.run(os.getenv("DISCORD_TOKEN"))
 

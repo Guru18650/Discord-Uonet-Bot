@@ -67,9 +67,11 @@ async def GetGradesEmbed(c):
         gradeString = ""
         for grade in gradesD[key]:
             gradeString = gradeString + str(grade.value)[0] + ", "
-        
+            count+=1*grade.column.weight
+            sum+=grade.value*grade.column.weight
         embed.add_field(name=grade.column.subject.name, value=gradeString[:len(gradeString) - 2], inline=True)
     embed.set_footer(text="SztefanoV3 by Migu2137")
+    
     return embed
 
 async def GetExamsEmbed(c):
@@ -78,5 +80,14 @@ async def GetExamsEmbed(c):
     async for exam in exams:
         if(exam.deadline.date > date.today()):
             embed.add_field(name=exam.subject.name + " " + exam.type, value=str(exam.deadline.date) + " " + exam.topic, inline=True)
+    embed.set_footer(text="SztefanoV3 by Migu2137")
+    return embed
+
+async def GetHomeworkEmbed(c):
+    homeworks = await c.data.get_homework(last_sync = datetime(2022,9,1))
+    embed=discord.Embed(title="Zadania z UONET+", description=str(date.today()), color=0x5900ff) 
+    async for homework in homeworks:
+        if(homework.deadline.date > date.today()):
+            embed.add_field(name=homework.subject.name + " - " + str(homework.deadline.date), value=homework.content, inline=False)
     embed.set_footer(text="SztefanoV3 by Migu2137")
     return embed
